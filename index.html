@@ -1,8 +1,408 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#241016"><title>Колесо фортуны</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#241016">
+<title>Колесо фортуны</title>
+
 <style>
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;min-height:100svh;background:radial-gradient(circle at 50% 15%,#5b2930 0,#1d1015 42%,#0c0a0b 100%);color:#f7ead0;font:16px system-ui,sans-serif;display:grid;place-items:center}.page{width:min(100%,780px);padding:24px 16px 36px;text-align:center}.eyebrow{color:#e8bb73;letter-spacing:3px;font-size:11px;text-transform:uppercase}.eyebrow:before,.eyebrow:after{content:'✦';margin:0 10px;color:#c89045}h1{margin:10px 0 22px;font:700 clamp(36px,8vw,64px)/1 Georgia,serif;color:#f6d28b;text-shadow:0 3px #4b1d24,0 10px 30px #000}.sub{color:#d9bfa5;margin:0 auto 18px}.wheel-wrap{position:relative;width:min(100%,620px);margin:auto;padding:18px;border:8px solid #b87a32;border-radius:50%;background:#27171a;box-shadow:0 0 0 3px #f0cb7a,0 0 0 10px #4f2027,0 20px 55px #000b}.wheel-wrap:before{content:'♠  ♦  FORTUNE  ♣  ♥';position:absolute;inset:-29px;display:grid;place-items:center;color:#e1b76c;font:700 12px Georgia;letter-spacing:3px;pointer-events:none}.pointer{position:absolute;z-index:3;top:-5px;left:calc(50% - 17px);border-left:17px solid transparent;border-right:17px solid transparent;border-top:42px solid #f0cd86;filter:drop-shadow(0 4px 3px #000)}canvas{display:block;width:100%;height:auto;border-radius:50%;background:#191012}.result{min-height:48px;margin:20px 0 12px;font-size:clamp(20px,4vw,28px);color:#ffe2a2}.prizes{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:0 auto 18px;max-width:620px}.prizes span{padding:7px 11px;border:1px solid #9d6935;border-radius:999px;background:#24151a;color:#e8c98e;font-size:13px}button{width:min(100%,480px);min-height:60px;border:2px solid #f0c678;border-radius:10px;background:linear-gradient(#9c532e,#5b2028);color:#fff0cf;font:700 19px Georgia;box-shadow:0 5px 0 #35131a,0 12px 25px #0008;cursor:pointer}button:disabled{opacity:.55;cursor:default}.cat{position:absolute;right:-34px;bottom:15px;font-size:72px;filter:drop-shadow(0 8px 6px #000);transform:rotate(-8deg)}@media(max-width:600px){.page{padding-top:28px}.wheel-wrap{padding:10px;border-width:5px}.wheel-wrap:before{inset:-22px;font-size:9px}.cat{right:-17px;bottom:5px;font-size:48px}}
-</style></head><body><main class="page"><div class="eyebrow">Дубровка Hookah & Lounge</div><h1>Колесо фортуны</h1><p class="sub">Пусть удача выберет ваш подарок</p><div class="wheel-wrap"><div class="pointer"></div><div class="cat">🐈</div><canvas id="wheel" width="900" height="900" aria-label="Колесо фортуны"></canvas></div><div id="result" class="result">Ваш счастливый приз ждёт вас</div><div class="prizes" aria-label="Призы"><span>Десерт</span><span>Дымный коктейль</span><span>Чай</span><span>10% скидка</span><span>Ассорти закусок</span><span>Лимонад</span><span>Сет настоек</span><span>20% скидка</span></div><button id="spin">Проверяем доступ…</button></main><script src="https://telegram.org/js/telegram-web-app.js"></script><script>
-const prizes=['Десерт','Дымный коктейль','Чай','10% скидка','Ассорти закусок','Лимонад','Сет настоек','20% скидка'],colors=['#7b2736','#c18a3e','#3e252b','#a54143','#d0a04c','#56222d','#9b3e3f','#76512d'],c=document.querySelector('#wheel'),x=c.getContext('2d'),btn=document.querySelector('#spin'),out=document.querySelector('#result');let angle=0,busy=false;prizes.forEach((p,i)=>{let a=-Math.PI/2+i*2*Math.PI/prizes.length,b=a+2*Math.PI/prizes.length;x.beginPath();x.moveTo(450,450);x.arc(450,450,430,a,b);x.fillStyle=colors[i];x.fill();x.strokeStyle='#f0c678';x.lineWidth=4;x.stroke();x.save();x.translate(450,450);x.rotate((a+b)/2);x.translate(285,0);x.rotate(Math.PI/2);x.fillStyle='#fff1c7';x.font='700 '+(p.length>13?'25':'31')+'px Georgia';x.textAlign='center';x.textBaseline='middle';x.fillText(p,0,0);x.restore()});x.beginPath();x.arc(450,450,75,0,7);x.fillStyle='#271116';x.fill();x.strokeStyle='#e6b964';x.lineWidth=6;x.stroke();x.fillStyle='#e6b964';x.font='34px Georgia';x.textAlign='center';x.fillText('★',450,462);const tg=window.Telegram?.WebApp,initData=tg?.initData||'';async function req(path,extra={}){let r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData,...extra})});let d=await r.json();if(!r.ok)throw Error(d.error||'Ошибка сервера');return d}function used(d){out.textContent='Ваш приз: '+d.prize;btn.disabled=true;btn.textContent='Прокрут использован';c.style.transform='rotate('+(360-(d.index+.5)*360/prizes.length)+'deg)'}async function load(){if(!initData){out.textContent='Откройте колесо через Telegram-бота';btn.textContent='Открыть бота';btn.disabled=false;btn.onclick=()=>location.href='https://t.me/Dubrovka86_bot';return}try{let d=await req('/api/status');if(d.used)used(d);else{btn.disabled=false;btn.textContent='Крутить колесо';btn.onclick=spin}}catch(e){out.textContent=e.message;btn.textContent='Повторить';btn.disabled=false;btn.onclick=load}}async function spin(){if(busy)return;busy=true;btn.disabled=true;btn.textContent='Колесо вращается…';try{let d=await req('/api/spin',{requestId:crypto.randomUUID()});if(d.alreadyUsed){used(d);return}angle+=1800+(360-(d.index+.5)*360/prizes.length-angle%360+360)%360;c.style.transform='rotate('+angle+'deg)';await new Promise(r=>setTimeout(r,4100));out.textContent='Ваш приз: '+d.prize;btn.textContent='Прокрут использован';await req('/api/notify').catch(()=>{})}catch(e){out.textContent=e.message;btn.textContent='Повторить';btn.disabled=false;btn.onclick=load}finally{busy=false}}if(tg){tg.ready();tg.expand()}load();</script></body></html>
+*{box-sizing:border-box}
+html{color-scheme:dark}
+
+body{
+  margin:0;
+  min-height:100svh;
+  background:radial-gradient(circle at 50% 15%,#5b2930 0,#1d1015 42%,#0c0a0b 100%);
+  color:#f7ead0;
+  font:16px system-ui,sans-serif;
+  display:grid;
+  place-items:center
+}
+
+.page{
+  width:min(100%,780px);
+  padding:24px 16px 36px;
+  text-align:center
+}
+
+.eyebrow{
+  color:#e8bb73;
+  letter-spacing:3px;
+  font-size:11px;
+  text-transform:uppercase
+}
+
+.eyebrow:before,
+.eyebrow:after{
+  content:'✦';
+  margin:0 10px;
+  color:#c89045
+}
+
+h1{
+  margin:10px 0 22px;
+  font:700 clamp(36px,8vw,64px)/1 Georgia,serif;
+  color:#f6d28b;
+  text-shadow:0 3px #4b1d24,0 10px 30px #000
+}
+
+.sub{
+  color:#d9bfa5;
+  margin:0 auto 18px
+}
+
+.wheel-wrap{
+  position:relative;
+  width:min(100%,620px);
+  margin:auto;
+  padding:18px;
+  border:8px solid #b87a32;
+  border-radius:50%;
+  background:#27171a;
+  box-shadow:
+    0 0 0 3px #f0cb7a,
+    0 0 0 10px #4f2027,
+    0 20px 55px #000b
+}
+
+.wheel-wrap:before{
+  content:'♠  ♦  FORTUNE  ♣  ♥';
+  position:absolute;
+  inset:-29px;
+  display:grid;
+  place-items:center;
+  color:#e1b76c;
+  font:700 12px Georgia;
+  letter-spacing:3px;
+  pointer-events:none
+}
+
+.pointer{
+  position:absolute;
+  z-index:3;
+  top:-5px;
+  left:calc(50% - 17px);
+  border-left:17px solid transparent;
+  border-right:17px solid transparent;
+  border-top:42px solid #f0cd86;
+  filter:drop-shadow(0 4px 3px #000)
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:50%;
+  background:#191012;
+  will-change:transform;
+  transform:translateZ(0);
+  transition:transform 4s cubic-bezier(.12,.75,.18,1)
+}
+
+.result{
+  min-height:48px;
+  margin:20px 0 12px;
+  font-size:clamp(20px,4vw,28px);
+  color:#ffe2a2
+}
+
+.prizes{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:7px;
+  margin:0 auto 18px;
+  max-width:620px
+}
+
+.prizes span{
+  padding:7px 11px;
+  border:1px solid #9d6935;
+  border-radius:999px;
+  background:#24151a;
+  color:#e8c98e;
+  font-size:13px
+}
+
+button{
+  width:min(100%,480px);
+  min-height:60px;
+  border:2px solid #f0c678;
+  border-radius:10px;
+  background:linear-gradient(#9c532e,#5b2028);
+  color:#fff0cf;
+  font:700 19px Georgia;
+  box-shadow:0 5px 0 #35131a,0 12px 25px #0008;
+  cursor:pointer
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:default
+}
+
+@media(max-width:600px){
+  .page{padding-top:28px}
+
+  .wheel-wrap{
+    padding:10px;
+    border-width:5px
+  }
+
+  .wheel-wrap:before{
+    inset:-22px;
+    font-size:9px
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="page">
+  <div class="eyebrow">Дубровка Hookah & Lounge</div>
+
+  <h1>Колесо фортуны</h1>
+
+  <p class="sub">Пусть удача выберет ваш подарок</p>
+
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="900" height="900" aria-label="Колесо фортуны"></canvas>
+  </div>
+
+  <div id="result" class="result">
+    Ваш счастливый приз ждёт вас
+  </div>
+
+  <div class="prizes" aria-label="Призы">
+    <span>Десерт</span>
+    <span>Дымный коктейль</span>
+    <span>Чай</span>
+    <span>10% скидка</span>
+    <span>Ассорти закусок</span>
+    <span>Лимонад</span>
+    <span>Сет настоек</span>
+    <span>20% скидка</span>
+  </div>
+
+  <button id="spin">Проверяем доступ…</button>
+</main>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<script>
+const prizes=[
+  'Десерт',
+  'Дымный коктейль',
+  'Чай',
+  '10% скидка',
+  'Ассорти закусок',
+  'Лимонад',
+  'Сет настоек',
+  '20% скидка'
+];
+
+const colors=[
+  '#7b2736',
+  '#c18a3e',
+  '#3e252b',
+  '#a54143',
+  '#d0a04c',
+  '#56222d',
+  '#9b3e3f',
+  '#76512d'
+];
+
+const c=document.querySelector('#wheel');
+const x=c.getContext('2d');
+const btn=document.querySelector('#spin');
+const out=document.querySelector('#result');
+
+let angle=0;
+let busy=false;
+
+prizes.forEach((prize,index)=>{
+  const start=-Math.PI/2+index*2*Math.PI/prizes.length;
+  const end=start+2*Math.PI/prizes.length;
+
+  x.beginPath();
+  x.moveTo(450,450);
+  x.arc(450,450,430,start,end);
+  x.fillStyle=colors[index];
+  x.fill();
+
+  x.strokeStyle='#f0c678';
+  x.lineWidth=4;
+  x.stroke();
+
+  x.save();
+  x.translate(450,450);
+  x.rotate((start+end)/2);
+  x.translate(285,0);
+  x.rotate(Math.PI/2);
+
+  x.fillStyle='#fff1c7';
+  x.font='700 '+(prize.length>13?'25':'31')+'px Georgia';
+  x.textAlign='center';
+  x.textBaseline='middle';
+  x.fillText(prize,0,0);
+
+  x.restore();
+});
+
+x.beginPath();
+x.arc(450,450,75,0,Math.PI*2);
+x.fillStyle='#271116';
+x.fill();
+
+x.strokeStyle='#e6b964';
+x.lineWidth=6;
+x.stroke();
+
+x.fillStyle='#e6b964';
+x.font='34px Georgia';
+x.textAlign='center';
+x.fillText('★',450,462);
+
+const tg=window.Telegram?.WebApp;
+const initData=tg?.initData||'';
+
+async function req(path,extra={}){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>{
+    controller.abort();
+  },12000);
+
+  try{
+    const response=await fetch(path,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        initData,
+        ...extra
+      }),
+      signal:controller.signal
+    });
+
+    const data=await response.json();
+
+    if(!response.ok){
+      throw Error(data.error||'Ошибка сервера');
+    }
+
+    return data;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function showUsed(data){
+  out.textContent='Ваш приз: '+data.prize;
+  btn.disabled=true;
+  btn.textContent='Прокрут использован';
+
+  c.style.transform=
+    'rotate('+
+    (360-(data.index+.5)*360/prizes.length)+
+    'deg)';
+}
+
+async function load(){
+  if(!initData){
+    out.textContent='Откройте колесо через Telegram-бота';
+    btn.textContent='Открыть бота';
+    btn.disabled=false;
+
+    btn.onclick=()=>{
+      location.href='https://t.me/Dubrovka86_bot';
+    };
+
+    return;
+  }
+
+  try{
+    const data=await req('/api/status');
+
+    if(data.used){
+      showUsed(data);
+    }else{
+      btn.disabled=false;
+      btn.textContent='Крутить колесо';
+      btn.onclick=spin;
+    }
+  }catch(error){
+    out.textContent=
+      error.name==='AbortError'
+        ? 'Сервер отвечает слишком долго. Попробуйте ещё раз.'
+        : 'Не удалось загрузить колесо. Попробуйте ещё раз.';
+
+    btn.textContent='Повторить';
+    btn.disabled=false;
+    btn.onclick=load;
+  }
+}
+
+async function spin(){
+  if(busy)return;
+
+  busy=true;
+  btn.disabled=true;
+  btn.textContent='Колесо вращается…';
+
+  try{
+    const data=await req('/api/spin',{
+      requestId:crypto.randomUUID()
+    });
+
+    if(data.alreadyUsed){
+      showUsed(data);
+      return;
+    }
+
+    const target=
+      360-
+      (data.index+.5)*360/prizes.length;
+
+    const current=angle%360;
+    const extra=(target-current+360)%360;
+
+    angle+=1800+extra;
+
+    c.style.transform='rotate('+angle+'deg)';
+
+    await new Promise(resolve=>{
+      setTimeout(resolve,4100);
+    });
+
+    out.textContent='Ваш приз: '+data.prize;
+    btn.textContent='Прокрут использован';
+
+    await req('/api/notify').catch(()=>{
+      // Уведомление необязательно для работы колеса
+    });
+  }catch(error){
+    out.textContent=
+      error.name==='AbortError'
+        ? 'Сервер отвечает слишком долго. Попробуйте ещё раз.'
+        : 'Не удалось завершить вращение. Попробуйте ещё раз.';
+
+    btn.textContent='Повторить';
+    btn.disabled=false;
+    btn.onclick=load;
+  }finally{
+    busy=false;
+  }
+}
+
+if(tg){
+  tg.ready();
+  tg.expand();
+}
+
+load();
+</script>
+</body>
+</html>
