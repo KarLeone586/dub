@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 export const ADMIN_ID=7545540622;
-export const welcome='Привет! Крутите колесо и получайте подарки 🎁\n\nПервый прокрут — бесплатно. Следующий — за чек от 5 000 ₽ после проверки администратора.\n\nНажмите «Крутить колесо» или отправьте сюда фото / PDF чека.';
+export const welcome='Старое доброе колесо Фортуны уже ждёт вас, мой дорогой гость! 🥂✨\\n\\nНажмите «Крутить колесо» или отправьте фото / PDF вашего счёта нашему дворецкому прямо сюда.';
 export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};}
 const instructions='Отправьте сюда одно чёткое фото чека или PDF (до 10 МБ). На чеке должны быть видны заведение, дата, сумма от 5 000 ₽ и реквизиты.\n\nАдминистратор проверит чек. После одобрения вы получите один прокрут. Один чек можно использовать только один раз.';
 export async function handle(update,api,url,internal){
