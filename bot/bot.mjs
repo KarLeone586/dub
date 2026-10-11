@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 export const ADMIN_ID=7545540622;
 export const welcome='Старое доброе колесо Фортуны уже ждёт вас, мой дорогой гость! 🥂✨\n\nИспытайте удачу и узнайте, какой подарок приготовила для вас «Дубровка».\n\nНажмите «Крутить колесо» — и пусть удача будет на вашей стороне! ✨';
-export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};}
+export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url}}]]};}
 const instructions='Отправьте сюда фото чека от 5 000 ₽ из нашего заведения. Администратор проверит чек и после одобрения начислит один дополнительный прокрут.';
 export async function handle(update,api,url,internal){
  const q=update.callback_query;
