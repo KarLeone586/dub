@@ -7,7 +7,16 @@ export const ADMIN_ID=7545540622;
 export const db=new Database(Bun.env.DB_PATH||'/data/wheel.sqlite',{create:true});
 db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
 db.exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, credits INTEGER NOT NULL CHECK(credits>=0)); CREATE TABLE IF NOT EXISTS rounds (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER NOT NULL,request_id TEXT NOT NULL,prize_index INTEGER NOT NULL,created_at INTEGER NOT NULL, UNIQUE(user_id,request_id)); CREATE TABLE IF NOT EXISTS receipts (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER NOT NULL,file_unique_id TEXT NOT NULL UNIQUE,file_id TEXT NOT NULL,kind TEXT NOT NULL,caption TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'pending',created_at INTEGER NOT NULL,decided_at INTEGER,decided_by INTEGER); CREATE UNIQUE INDEX IF NOT EXISTS one_pending_receipt ON receipts(user_id) WHERE status='pending'; CREATE TABLE IF NOT EXISTS outbox (id INTEGER PRIMARY KEY AUTOINCREMENT,event_key TEXT NOT NULL UNIQUE,method TEXT NOT NULL,payload TEXT NOT NULL,sent INTEGER NOT NULL DEFAULT 0,attempts INTEGER NOT NULL DEFAULT 0,next_attempt INTEGER NOT NULL,lease_until INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS migrations(name TEXT PRIMARY KEY);");
-const prizes=[['Дымный коктейль',45],['Скидка 10%',90],['Чай',135],['Бургер с рваным петухом',78],['Лимонад',135],['Скидка 20%',72],['Десерт',225]];
+const prizes=[
+  {"name":"Десерт","label":["Десерт"]},
+  {"name":"Дымный коктейль","label":["Дымный","коктейль"]},
+  {"name":"Чай","label":["Чай"]},
+  {"name":"10% скидка","label":["10%","скидка"]},
+  {"name":"Ассорти закусок","label":["Ассорти","закусок"]},
+  {"name":"Лимонад","label":["Лимонад"]},
+  {"name":"Сет настоек","label":["Сет","настоек"]},
+  {"name":"20% скидка","label":["20%","скидка"]}
+];
 const APP_URL='https://dub-production.up.railway.app';
 const markup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
 function enqueue(key,method,payload,delay=0){db.query('INSERT OR IGNORE INTO outbox(event_key,method,payload,next_attempt) VALUES(?,?,?,?)').run(key,method,JSON.stringify(payload),Date.now()+delay);}
