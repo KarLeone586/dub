@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 export const ADMIN_ID=7545540622;
+export const ADMIN_IDS=[7545540622,812392131];
 export const welcome='Старое доброе колесо Фортуны уже ждёт вас, мой дорогой гость! 🥂✨\n\nИспытайте удачу и узнайте, какой подарок приготовила для вас «Дубровка».\n\nНажмите «Крутить колесо» — и пусть удача будет на вашей стороне! ✨';
 export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url}}]]};}
 const instructions='Отправьте сюда фото чека от 5 000 ₽ из нашего заведения. Администратор проверит чек и после одобрения начислит один дополнительный прокрут.';
@@ -13,8 +14,8 @@ export async function handle(update,api,url,internal){
    await api('answerCallbackQuery',{callback_query_id:q.id,text:'Проверяю решение…'});
    const [action,id]=q.data.split(':');const result=await internal('/internal/decision',{adminId:q.from.id,receiptId:Number(id),action});
    const text=result.missing?'Чек не найден':result.status==='approved'?'✅ Чек №'+id+' одобрен. Один прокрут начислен.':'❌ Чек №'+id+' отклонён.';
-   await api('editMessageReplyMarkup',{chat_id:ADMIN_ID,message_id:q.message.message_id,reply_markup:{inline_keyboard:[]}}).catch(()=>{});
-   await api('sendMessage',{chat_id:ADMIN_ID,text:(result.alreadyDecided?'Решение уже сохранено. ':'')+text});return;
+   await api('editMessageReplyMarkup',{chat_id:m.from.id,message_id:q.message.message_id,reply_markup:{inline_keyboard:[]}}).catch(()=>{});
+   await api('sendMessage',{chat_id:m.from.id,text:(result.alreadyDecided?'Решение уже сохранено. ':'')+text});return;
   }
   await api('answerCallbackQuery',{callback_query_id:q.id});
   if(['receipt','rules'].includes(q.data)&&q.message?.chat.type==='private')await api('sendMessage',{chat_id:q.from.id,text:instructions});return;
@@ -22,9 +23,9 @@ export async function handle(update,api,url,internal){
  const m=update.message;if(!m||m.chat.type!=='private')return;
  const command=(m.text||'').split(/\s/)[0].split('@')[0];
  if(command==='/admin'){
-  if(m.from.id!==ADMIN_ID){await api('sendMessage',{chat_id:m.chat.id,text:'Раздел доступен только администратору.'});return;}
+  if(!ADMIN_IDS.includes(m.from.id)){await api('sendMessage',{chat_id:m.chat.id,text:'Раздел доступен только администратору.'});return;}
   const list=await internal('/internal/pending',{adminId:m.from.id});
-  if(!list.receipts.length)await api('sendMessage',{chat_id:ADMIN_ID,text:'Новых чеков на проверке нет.'});
+  if(!list.receipts.length)await api('sendMessage',{chat_id:m.from.id,text:'Новых чеков на проверке нет.'});
   for(const row of list.receipts)await api(row.method,row.payload);return;
  }
  if(command==='/receipt'){await api('sendMessage',{chat_id:m.chat.id,text:instructions});return;}
@@ -36,7 +37,7 @@ export async function handle(update,api,url,internal){
   await api('sendMessage',{chat_id:m.chat.id,text:result.duplicate?'Этот файл уже был отправлен. Повторно зачесть один и тот же чек нельзя.':result.pending?'Ваш чек №'+result.id+' уже ожидает проверки. Дождитесь решения администратора.':'Чек №'+result.id+' принят на проверку ✅ После одобрения начислим один прокрут.'});return;
  }
  await api('sendMessage',{chat_id:m.chat.id,text:['/start','/wheel','/help'].includes(command)?welcome:'Откройте колесо по кнопке или отправьте фото / PDF чека от 5 000 ₽.',reply_markup:keyboard(url)});
- if(command==='/start'&&m.from.id===ADMIN_ID)await api('sendMessage',{chat_id:ADMIN_ID,text:'Вы — администратор. Новые чеки будут приходить сюда с кнопками одобрения и отклонения. Команда /admin показывает до 10 ожидающих чеков.'});
+ if(command==='/start'&&ADMIN_IDS.includes(m.from.id))await api('sendMessage',{chat_id:m.from.id,text:'Вы — администратор. Новые чеки будут приходить сюда с кнопками одобрения и отклонения. Команда /admin показывает до 10 ожидающих чеков.'});
 }
 
 export async function main(){
