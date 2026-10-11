@@ -16,7 +16,7 @@ const prizes=[
   {"name":"Лимонад","label":["Лимонад"]},
   {"name":"Сет настоек","label":["Сет","настоек"]},
   {"name":"20% скидка","label":["20%","скидка"]}
-];
+]; 
 const APP_URL='https://dub-production.up.railway.app';
 const markup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
 function enqueue(key,method,payload,delay=0){db.query('INSERT OR IGNORE INTO outbox(event_key,method,payload,next_attempt) VALUES(?,?,?,?)').run(key,method,JSON.stringify(payload),Date.now()+delay);}
