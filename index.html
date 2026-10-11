@@ -102,8 +102,7 @@ canvas{
   border-radius:50%;
   background:#171112;
   transform:translateZ(0);
-  will-change:transform;
-  transition:transform 5.2s cubic-bezier(.15,.82,.18,1)
+  will-change:transform
 }
 
 .result{
@@ -270,7 +269,7 @@ ctx.lineWidth=7;
 ctx.stroke();
 
 ctx.fillStyle="#dfbd70";
-ctx.font="700 29px Georgia";
+ctx.font="700 25px Georgia";
 ctx.textAlign="center";
 ctx.textBaseline="middle";
 ctx.fillText("FORTUNE",450,450);
@@ -310,19 +309,60 @@ async function request(path,extra={}){
   }
 }
 
+function prizeIndexFromData(data){
+  const index=prizes.indexOf(data.prize);
+
+  if(index<0){
+    throw new Error("Выпавший приз отсутствует на колесе");
+  }
+
+  return index;
+}
+
 function showUsed(data){
   result.textContent="Ваш приз: "+data.prize;
   button.disabled=true;
   button.textContent="Прокрут использован";
 
-  const prizeIndex=prizes.indexOf(data.prize);
+  const index=prizeIndexFromData(data);
+  const sector=360/prizes.length;
+  const target=360-(index+.5)*sector;
 
-  if(prizeIndex>=0){
-    const sector=360/prizes.length;
-    const target=360-(prizeIndex+.5)*sector;
+  canvas.style.transform="rotate("+target+"deg)";
+}
 
-    canvas.style.transform="rotate("+target+"deg)";
-  }
+function animateWheel(finalAngle){
+  const startAngle=angle;
+  const duration=6000;
+  const startedAt=performance.now();
+
+  return new Promise(resolve=>{
+    function frame(now){
+      const progress=Math.min(
+        (now-startedAt)/duration,
+        1
+      );
+
+      const eased=1-Math.pow(1-progress,4);
+      const currentAngle=
+        startAngle+
+        (finalAngle-startAngle)*eased;
+
+      canvas.style.transform=
+        "rotate("+currentAngle+"deg)";
+
+      if(progress<1){
+        requestAnimationFrame(frame);
+      }else{
+        angle=finalAngle;
+        canvas.style.transform=
+          "rotate("+angle+"deg)";
+        resolve();
+      }
+    }
+
+    requestAnimationFrame(frame);
+  });
 }
 
 async function load(){
@@ -377,24 +417,15 @@ async function spin(){
       return;
     }
 
-    const prizeIndex=prizes.indexOf(data.prize);
-
-    if(prizeIndex<0){
-      throw new Error("Приз отсутствует на колесе");
-    }
-
+    const index=prizeIndexFromData(data);
     const sector=360/prizes.length;
-    const target=360-(prizeIndex+.5)*sector;
+    const target=360-(index+.5)*sector;
     const current=((angle%360)+360)%360;
     const extra=(target-current+360)%360;
 
-    angle+=1800+extra;
+    const finalAngle=angle+1800+extra;
 
-    canvas.style.transform="rotate("+angle+"deg)";
-
-    await new Promise(resolve=>{
-      setTimeout(resolve,5300);
-    });
+    await animateWheel(finalAngle);
 
     result.textContent="Ваш приз: "+data.prize;
     button.textContent="Прокрут использован";
