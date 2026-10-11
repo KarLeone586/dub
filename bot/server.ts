@@ -18,10 +18,11 @@ const prizes=[
   {"name":"20% скидка","label":["20%","скидка"],"weight":10}
 ]; 
 const APP_URL='https://dub-production.up.railway.app';
-const markup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
+const markup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}]]};
+const prizeMarkup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
 function enqueue(key,method,payload,delay=0){db.query('INSERT OR IGNORE INTO outbox(event_key,method,payload,next_attempt) VALUES(?,?,?,?)').run(key,method,JSON.stringify(payload),Date.now()+delay);}
 function ensureUser(id){db.query('INSERT OR IGNORE INTO users(id,credits) VALUES(?,1)').run(id);}
-function prizeMessage(row){return {chat_id:row.user_id,text:'🎉🎉 УРА, ПОЗДРАВЛЯЕМ! 🎉🎉\n\nВы выиграли: '+prizes[row.prize_index].name+'! ✨🥳\n\nХотите ещё один счастливый прокрут? Отправьте сюда фото чека от 5 000 ₽ из нашего заведения.\n\nАдминистратор проверит чек и откроет вам доступ к новой попытке. Пусть удача снова улыбнётся вам! 🥂✨',reply_markup:markup};}
+function prizeMessage(row){return {chat_id:row.user_id,text:'🎉🎉 УРА, ПОЗДРАВЛЯЕМ! 🎉🎉\n\nВы выиграли: '+prizes[row.prize_index].name+'! ✨🥳\n\nХотите ещё один счастливый прокрут? Отправьте сюда фото чека от 5 000 ₽ из нашего заведения.\n\nАдминистратор проверит чек и откроет вам доступ к новой попытке. Пусть удача снова улыбнётся вам! 🥂✨',reply_markup:prizeMarkup};}
 // One-time migration: old results remain used and old pending messages remain deliverable.
 db.transaction(()=>{if(db.query('SELECT 1 FROM migrations WHERE name=?').get('receipts-v3'))return;if(db.query("SELECT 1 FROM sqlite_master WHERE type='table' AND name='spins'").get()){for(const old of db.query('SELECT * FROM spins').all()){db.query('INSERT OR IGNORE INTO users(id,credits) VALUES(?,0)').run(old.user_id);db.query('INSERT OR IGNORE INTO rounds(user_id,request_id,prize_index,created_at) VALUES(?,?,?,?)').run(old.user_id,'legacy',old.prize_index,old.created_at);const row=db.query('SELECT * FROM rounds WHERE user_id=? AND request_id=?').get(old.user_id,'legacy');if(!old.notified)enqueue('prize:'+row.id,'sendMessage',prizeMessage(row));}}db.query('INSERT INTO migrations(name) VALUES(?)').run('receipts-v3');})();
 function latest(id){return db.query('SELECT * FROM rounds WHERE user_id=? ORDER BY id DESC LIMIT 1').get(id);}
