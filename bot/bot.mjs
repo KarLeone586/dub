@@ -10,7 +10,7 @@ export async function handle(update,api,url,internal){
  const q=update.callback_query;
  if(q){
   if(/^(approve|reject):/.test(q.data||'')){
-   if(q.from.id!==ADMIN_ID||q.message?.chat.id!==ADMIN_ID){await api('answerCallbackQuery',{callback_query_id:q.id,text:'Доступ только администратору',show_alert:true});return;}
+   if(!ADMIN_IDS.includes(q.from.id)||q.message?.chat.id!==q.from.id){await api('answerCallbackQuery',{callback_query_id:q.id,text:'Доступ только администратору',show_alert:true});return;}
    await api('answerCallbackQuery',{callback_query_id:q.id,text:'Проверяю решение…'});
    const [action,id]=q.data.split(':');const result=await internal('/internal/decision',{adminId:q.from.id,receiptId:Number(id),action});
    const text=result.missing?'Чек не найден':result.status==='approved'?'✅ Чек №'+id+' одобрен. Один прокрут начислен.':'❌ Чек №'+id+' отклонён.';
