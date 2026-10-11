@@ -9,15 +9,12 @@
 <style>
 *{box-sizing:border-box}
 
-html{
-  color-scheme:dark
-}
+html{color-scheme:dark}
 
 body{
   margin:0;
   min-height:100svh;
-  background:
-    radial-gradient(circle at 50% 8%,#3b2025 0,#171113 45%,#090808 100%);
+  background:radial-gradient(circle at 50% 8%,#3b2025 0,#171113 45%,#090808 100%);
   color:#ead7ad;
   font-family:Georgia,"Times New Roman",serif;
   display:grid;
@@ -106,7 +103,7 @@ canvas{
   background:#171112;
   transform:translateZ(0);
   will-change:transform;
-  transition:transform 4.2s cubic-bezier(.12,.75,.18,1)
+  transition:transform 5.2s cubic-bezier(.15,.82,.18,1)
 }
 
 .result{
@@ -142,9 +139,7 @@ button{
   background:linear-gradient(#6b382d,#38191f);
   color:#eddbaf;
   font:700 19px Georgia,serif;
-  box-shadow:
-    0 4px 0 #211014,
-    0 12px 25px #0009;
+  box-shadow:0 4px 0 #211014,0 12px 25px #0009;
   cursor:pointer
 }
 
@@ -154,9 +149,7 @@ button:disabled{
 }
 
 @media(max-width:600px){
-  .page{
-    padding-top:28px
-  }
+  .page{padding-top:28px}
 
   .wheel-wrap{
     padding:11px;
@@ -169,9 +162,7 @@ button:disabled{
     letter-spacing:2px
   }
 
-  .result{
-    font-size:22px
-  }
+  .result{font-size:22px}
 }
 </style>
 </head>
@@ -324,10 +315,14 @@ function showUsed(data){
   button.disabled=true;
   button.textContent="Прокрут использован";
 
-  canvas.style.transform=
-    "rotate("+
-    (360-(data.index+.5)*360/prizes.length)+
-    "deg)";
+  const prizeIndex=prizes.indexOf(data.prize);
+
+  if(prizeIndex>=0){
+    const sector=360/prizes.length;
+    const target=360-(prizeIndex+.5)*sector;
+
+    canvas.style.transform="rotate("+target+"deg)";
+  }
 }
 
 async function load(){
@@ -382,11 +377,15 @@ async function spin(){
       return;
     }
 
-    const target=
-      360-
-      (data.index+.5)*360/prizes.length;
+    const prizeIndex=prizes.indexOf(data.prize);
 
-    const current=angle%360;
+    if(prizeIndex<0){
+      throw new Error("Приз отсутствует на колесе");
+    }
+
+    const sector=360/prizes.length;
+    const target=360-(prizeIndex+.5)*sector;
+    const current=((angle%360)+360)%360;
     const extra=(target-current+360)%360;
 
     angle+=1800+extra;
@@ -394,7 +393,7 @@ async function spin(){
     canvas.style.transform="rotate("+angle+"deg)";
 
     await new Promise(resolve=>{
-      setTimeout(resolve,4300);
+      setTimeout(resolve,5300);
     });
 
     result.textContent="Ваш приз: "+data.prize;
