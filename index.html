@@ -251,11 +251,25 @@ prizes.forEach((prize,index)=>{
   ctx.translate(285,0);
   ctx.rotate(Math.PI/2);
 
-  ctx.fillStyle="#f0dfba";
-  ctx.font="700 "+(prize.length>13?"24":"30")+"px Georgia";
+  const labelLines={
+    "Дымный коктейль":["Дымный","коктейль"],
+    "Ассорти закусок":["Ассорти","закусок"],
+    "10% скидка":["10%","скидка"],
+    "Сет настоек":["Сет","настоек"],
+    "20% скидка":["20%","скидка"]
+  }[prize]||[prize];
+  const fontSize=labelLines.length>1?22:(prize.length>11?24:28);
+
+  ctx.fillStyle="#f5dfb0";
+  ctx.font="600 "+fontSize+"px Cinzel, Georgia, serif";
   ctx.textAlign="center";
   ctx.textBaseline="middle";
-  ctx.fillText(prize,0,0);
+  ctx.shadowColor="#000";
+  ctx.shadowBlur=5;
+  labelLines.forEach((line,lineIndex)=>{
+    ctx.fillText(line,0,(lineIndex-(labelLines.length-1)/2)*30);
+  });
+  ctx.shadowBlur=0;
 
   ctx.restore();
 });
@@ -270,7 +284,7 @@ ctx.lineWidth=7;
 ctx.stroke();
 
 ctx.fillStyle="#dfbd70";
-ctx.font="700 25px Georgia";
+ctx.font="600 25px Cinzel, Georgia, serif";
 ctx.textAlign="center";
 ctx.textBaseline="middle";
 ctx.fillText("FORTUNE",450,450);
