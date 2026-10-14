@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#120e10">
-<title>Колесо фортуны</title>
+<title>Колесо Фортуны · Дубровка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poiret+One&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box}
@@ -165,6 +168,9 @@ button:disabled{
 }
 
 .brand-logo{display:block;width:min(92vw,520px);margin:0 auto 20px;padding:12px 20px;border:2px solid #b52f49;color:#fff;font:600 clamp(28px,7vw,54px)/1 Georgia,serif;letter-spacing:.16em;text-align:center;text-shadow:0 3px 12px #000}.brand-logo span{display:block;margin-top:10px;font:300 clamp(14px,3vw,22px) Arial,sans-serif;letter-spacing:.08em}
+
+/* Art Deco / The Great Gatsby theme */
+html{background:#090708}body{background:radial-gradient(circle at 50% 15%,#5b2533 0,#1b1018 38%,#080709 100%);color:#f5d99a;font-family:Cinzel,Georgia,serif;position:relative;overflow-x:hidden}body:before,body:after{content:"";position:fixed;inset:18px;border:1px solid #d5a84d55;pointer-events:none;z-index:0}body:after{inset:28px;border:1px solid #d5a84d22}.page{position:relative;z-index:1;max-width:860px;padding:34px 18px 46px}.eyebrow{font-family:Poiret One,Cinzel,serif;color:#e4bd68;letter-spacing:5px;text-shadow:0 0 16px #e4bd6844}.eyebrow:before,.eyebrow:after{color:#e4bd68}h1{font-family:Cinzel,Georgia,serif;font-weight:500;letter-spacing:3px;color:#f4d48b;text-shadow:0 2px 0 #34151e,0 0 30px #d29a3c55}.sub{font-family:Poiret One,Arial,sans-serif;color:#e7c98b;letter-spacing:1px}.wheel-wrap{padding:21px;border:5px solid #b88635;background:linear-gradient(145deg,#25131b,#0d0a0e);box-shadow:0 0 0 2px #f2d18a,0 0 0 10px #3b1724,0 0 45px #d09a3c44,0 22px 55px #000}.wheel-wrap:before{color:#d7ad5d;font-family:Cinzel,serif;letter-spacing:4px}.pointer{border-top-color:#f2d18a;filter:drop-shadow(0 0 5px #e6b44d)}canvas{background:#120c10}.result{font-family:Cinzel,Georgia,serif;color:#f5d99a;text-shadow:0 0 12px #e4bd6844}button{font-family:Cinzel,Georgia,serif;letter-spacing:1px;border:1px solid #e5bd65;border-radius:4px;background:linear-gradient(135deg,#6e2637,#2a111d);color:#f7dda0;box-shadow:0 4px 0 #12080d,0 0 25px #c28b3b33}button:hover:not(:disabled){background:linear-gradient(135deg,#91384a,#3b1724);filter:brightness(1.12)}@media(max-width:600px){body:before,body:after{inset:10px}.page{padding-top:28px}.wheel-wrap{padding:13px}.eyebrow{letter-spacing:3px}}
 </style>
 </head>
 
@@ -187,16 +193,7 @@ button:disabled{
     Ваш счастливый приз ждёт вас
   </div>
 
-  <div class="prizes" aria-label="Призы">
-    <span>Десерт</span>
-    <span>Дымный коктейль</span>
-    <span>Чай</span>
-    <span>10% скидка</span>
-    <span>Ассорти закусок</span>
-    <span>Лимонад</span>
-    <span>Сет настоек</span>
-    <span>20% скидка</span>
-  </div>
+  
 
   <button id="spin">Проверяем доступ…</button>
 </main>
