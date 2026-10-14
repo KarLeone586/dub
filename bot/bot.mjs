@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 export const ADMIN_ID=7545540622;
 export const ADMIN_IDS=[7545540622,812392131];
 export const welcome='Старое доброе колесо Фортуны уже ждёт вас, мои дорогие гости! 🥂✨\n\nПервое вращение — комплимент от заведения.\n\nСледующий шанс испытать судьбу откроется, как только администратор благосклонно утвердит ваш счёт на сумму от 5 000 ₽. ✨';
-export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url}}]]};}
+export function keyboard(url){return {inline_keyboard:[[{text:'🎡 Испытать удачу',web_app:{url}}]]};}
 const instructions='Отправьте сюда фото чека от 5 000 ₽ из нашего заведения. Администратор проверит чек и после одобрения начислит один дополнительный прокрут.';
 export async function handle(update,api,url,internal){
  const q=update.callback_query;
@@ -52,7 +52,7 @@ export async function main(){
   const data=await response.json();if(!data.ok){const error=new Error('Ошибка Telegram API: '+data.error_code);error.code=data.error_code;error.delay=data.parameters?.retry_after;throw error;}return data.result;
  }
  await api('getMe');const hook=await api('getWebhookInfo');if(hook.url)throw new Error('У бота уже настроен webhook. Используйте отдельного бота или отключите webhook перед запуском.');
- await api('setMyCommands',{commands:[{command:'start',description:'Открыть колесо фортуны'},{command:'wheel',description:'Крутить колесо'},{command:'help',description:'Как участвовать'},{command:'receipt',description:'Отправить чек'},{command:'admin',description:'Проверка чеков (администратор)'}]});
+ await api('setMyCommands',{commands:[{command:'start',description:'Открыть колесо фортуны'},{command:'wheel',description:'Испытать удачу'},{command:'help',description:'Как участвовать'},{command:'receipt',description:'Отправить чек'},{command:'admin',description:'Проверка чеков (администратор)'}]});
  console.log('Бот запущен. Для остановки нажмите Ctrl+C.');let offset=0;
  while(true){try{await fetch(miniAppUrl.replace(/\/$/,'')+'/internal/notify',{method:'POST',headers:{authorization:'Bearer '+createHash('sha256').update('wheel-notifications:'+token.trim()).digest('hex')},signal:AbortSignal.timeout(20000)}).catch(()=>{});const updates=await api('getUpdates',{offset,timeout:30,allowed_updates:['message','callback_query']});for(const update of updates){try{await handle(update,api,miniAppUrl,internal)}catch(error){if(error.code!==403)throw error}offset=update.update_id+1;}}catch(error){if([401,409].includes(error.code))throw new Error('Проверьте токен и убедитесь, что запущена только одна копия бота.');console.error('Нет связи с Telegram или временная ошибка. Повторяем запрос.');await new Promise(resolve=>setTimeout(resolve,(error.delay||5)*1000));}}
 }
