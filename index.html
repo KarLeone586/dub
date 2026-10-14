@@ -258,7 +258,7 @@ prizes.forEach((prize,index)=>{
     "Сет настоек":["Сет","настоек"],
     "20% скидка":["20%","скидка"]
   }[prize]||[prize];
-  const fontSize=labelLines.length>1?22:(prize.length>11?24:28);
+  const fontSize=labelLines.length>1?28:(prize.length>11?30:36);
 
   ctx.fillStyle="#f5dfb0";
   ctx.font="600 "+fontSize+"px Cinzel, Georgia, serif";
@@ -267,7 +267,7 @@ prizes.forEach((prize,index)=>{
   ctx.shadowColor="#000";
   ctx.shadowBlur=5;
   labelLines.forEach((line,lineIndex)=>{
-    ctx.fillText(line,0,(lineIndex-(labelLines.length-1)/2)*30);
+    ctx.fillText(line,0,(lineIndex-(labelLines.length-1)/2*34);
   });
   ctx.shadowBlur=0;
 
@@ -400,7 +400,7 @@ async function load(){
       showUsed(data);
     }else{
       button.disabled=false;
-      button.textContent="Крутить колесо";
+      button.textContent="Испытать удачу";
       button.onclick=spin;
     }
   }catch(error){
