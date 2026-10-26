@@ -19,8 +19,8 @@ const prizes=[
   {"name":"20% скидка","label":["20%","скидка"],"weight":10}
 ]; 
 const APP_URL='https://dub-production.up.railway.app';
-const markup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}]]};
-const prizeMarkup={inline_keyboard:[[{text:'🎡 Крутить колесо',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
+const markup={inline_keyboard:[[{text:'🎡 Испытать удачу',web_app:{url:APP_URL}}]]};
+const prizeMarkup={inline_keyboard:[[{text:'🎡 Испытать удачу',web_app:{url:APP_URL}}],[{text:'📎 Отправить чек',callback_data:'receipt'}]]};
 function enqueue(key,method,payload,delay=0){db.query('INSERT OR IGNORE INTO outbox(event_key,method,payload,next_attempt) VALUES(?,?,?,?)').run(key,method,JSON.stringify(payload),Date.now()+delay);}
 function ensureUser(id){db.query('INSERT OR IGNORE INTO users(id,credits) VALUES(?,1)').run(id);}
 function prizeMessage(row){return {chat_id:row.user_id,text:'Поздравляем! Ваш сегодняшний вечер отмечен золотой печатью успеха: в ваших руках оказывается: '+prizes[row.prize_index].name+'! ✨\n\nЕсли ваша жажда больших побед ещё не утолена, правила этой игры просты.\n\nОтправьте в чат фото чека на сумму от 5 000 рублей из нашего заведения.\n\nПара мгновений на проверку — и двери в мир новых побед снова распахнутся перед вами. Пусть этот вечер не кончается! 🥂🎩\n\nСыграем ещё?',reply_markup:prizeMarkup};}
