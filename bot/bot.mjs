@@ -14,7 +14,7 @@ export async function handle(update,api,url,internal){
    await api('answerCallbackQuery',{callback_query_id:q.id,text:'Проверяю решение…'});
    const [action,id]=q.data.split(':');const result=await internal('/internal/decision',{adminId:q.from.id,receiptId:Number(id),action});
    const text=result.missing?'Чек не найден':result.status==='approved'?'✅ Чек №'+id+' одобрен. Один прокрут начислен.':'❌ Чек №'+id+' отклонён.';
-   await api('editMessageReplyMarkup',{chat_id:m.from.id,message_id:q.message.message_id,reply_markup:{inline_keyboard:[]}}).catch(()=>{});
+   await api('editMessageReplyMarkup',{chat_id:q.from.id,message_id:q.message.message_id,reply_markup:{inline_keyboard:[]}}).catch(()=>{});
    await api('sendMessage',{chat_id:m.from.id,text:(result.alreadyDecided?'Решение уже сохранено. ':'')+text});return;
   }
   await api('answerCallbackQuery',{callback_query_id:q.id});
